@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/joho/godotenv"
-	"github.com/shomali11/slacker"
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
+	"github.com/shomali11/slacker"
 )
 
 var ()
@@ -25,7 +26,16 @@ func main() {
 
 	bot := slacker.NewClient(os.Getenv("SLACK_BOT_TOKEN"), os.Getenv("SLACK_APP_TOKEN"))
 	go printCommandEvents(bot.CommandEvents())
+	bot.Command("query for bot - <message>",&slacker.CommandDefinition{
+		Description: "send any question to wolfram server",
+		Example: "who is the primeminister of Nepal?",
+		Handler: func(botCtx slacker.BotContext, request slacker.Request, response slacker.ResponseWriter) {
+			query:=request.Param("message")
+			fmt.Println(query)
 
+			response.Reply("received responses")
+		},
+	})
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	err := bot.Listen(ctx)
